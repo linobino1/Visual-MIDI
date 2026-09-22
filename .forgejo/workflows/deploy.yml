@@ -1,0 +1,27 @@
+name: Build and deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Deploy static site to S3
+        uses: https://git.leohilsheimer.com/leo/static-sites-server@v2
+        with:
+          site-domain: www.visualmidi.art
+          source: ./
+          bucket: ${{ secrets.STATIC_SITES_S3_BUCKET }}
+          endpoint-url: ${{ secrets.STATIC_SITES_S3_ENDPOINT }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.STATIC_SITES_S3_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.STATIC_SITES_S3_SECRET_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.STATIC_SITES_S3_REGION }}
+          AWS_EC2_METADATA_DISABLED: "true"
